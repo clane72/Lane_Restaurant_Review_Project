@@ -4,7 +4,7 @@ var newMap;
 /**
  * Initialize map as soon as the page is loaded.
  */
-document.addEventListener('DOMContentLoaded', (event) => {  
+document.addEventListener('DOMContentLoaded', (event) => {
   initMap();
 });
 
@@ -15,26 +15,26 @@ initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
       console.error(error);
-    } else {      
+    } else {
       self.newMap = L.map('map', {
         center: [restaurant.latlng.lat, restaurant.latlng.lng],
         zoom: 16,
         scrollWheelZoom: false
       });
       L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-        mapboxToken: '<your MAPBOX API KEY HERE>',
+        mapboxToken: 'pk.eyJ1IjoiY2xhbmU3MiIsImEiOiJjang3dnRtbnEwZXBrM3ltODBiaXcxODZ2In0.ZHO2frJcFWz92xGgfW2kdQ',
         maxZoom: 18,
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
           '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
           'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        id: 'mapbox.streets'    
+        id: 'mapbox.streets'
       }).addTo(newMap);
       fillBreadcrumb();
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
     }
   });
-}  
- 
+}
+
 /* window.initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
@@ -89,6 +89,20 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  const altText = restaurant.name + ' restaurant in ' + restaurant.neighborhood;
+  image.title = altText;
+  image.alt = altText;
+
+  //const image = document.getElementById('restaurant-img');
+  //image.className = 'restaurant-img'
+  //image.setAttribute('alt', `Photo of ${restaurant.name}`);
+  //image.src = DBHelper.imageUrlForRestaurantSmall(restaurant);
+  //if(window.innerWidth >= 400){
+  //  image.src = DBHelper.imageUrlForRestaurantLarge(restaurant);
+  //}
+  //if(window.innerWidth < 400){
+  //  image.src = DBHelper.imageUrlForRestaurantLarge(restaurant);
+  //}
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
@@ -146,26 +160,38 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 /**
  * Create review HTML and add it to the webpage.
  */
-createReviewHTML = (review) => {
-  const li = document.createElement('li');
-  const name = document.createElement('p');
-  name.innerHTML = review.name;
-  li.appendChild(name);
+ createReviewHTML = (review) => {
+   const li = document.createElement('li');
 
-  const date = document.createElement('p');
-  date.innerHTML = review.date;
-  li.appendChild(date);
+   const name = document.createElement('h4');
+   name.innerHTML = review.name;
 
-  const rating = document.createElement('p');
-  rating.innerHTML = `Rating: ${review.rating}`;
-  li.appendChild(rating);
+   const date = document.createElement('h4');
+   date.innerHTML = review.date;
 
-  const comments = document.createElement('p');
-  comments.innerHTML = review.comments;
-  li.appendChild(comments);
+   const div = document.createElement('div');
+   div.id = 'date-name';
+   div.appendChild(name);
+   div.appendChild(date);
+   li.appendChild(div);
 
-  return li;
-}
+   const rating = document.createElement('h5');
+   rating.innerHTML = `RATING: ${review.rating}`;
+   li.appendChild(rating);
+
+   const comments = document.createElement('p');
+   comments.innerHTML = review.comments;
+   li.appendChild(comments);
+
+   const div2 = document.createElement('div');
+   div2.className = 'rating-comments';
+   div.setAttribute('tabindex', '3')
+   div2.appendChild(rating);
+   div2.appendChild(comments);
+   li.appendChild(div2);
+
+   return li;
+ }
 
 /**
  * Add restaurant name to the breadcrumb navigation menu
